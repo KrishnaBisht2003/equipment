@@ -5,12 +5,30 @@ import { useForm, Controller } from 'react-hook-form';
 import Select from 'react-select';
 import Image from 'next/image';
 
-export const CardItem = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [count, setCount] = useState(0);
-    const [formData, setFormData] = useState(null);
+interface FormData {
+    section: string;
+    type: string;
+    category: string;
+    inventoryQuantity: string;
+    size: string;
+    assembled: boolean;
+    brand: string;
+    model: string;
+    powerWatts: string;
+    equipmentImage: File | null;
+}
 
-    const { control, handleSubmit, reset, formState: { errors } } = useForm({
+interface SelectOption {
+    value: string;
+    label: string;
+}
+
+export const CardItem: React.FC = () => {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [count, setCount] = useState<number>(0);
+    const [formData, setFormData] = useState<FormData | null>(null);
+
+    const { control, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
         defaultValues: {
             section: '',
             type: '',
@@ -21,46 +39,50 @@ export const CardItem = () => {
             brand: '',
             model: '',
             powerWatts: '',
-            equipmentImage: undefined,
+            equipmentImage: null,
         },
     });
 
-    const onSubmit = (data) => {
+    const onSubmit = (data: FormData): void => {
         setFormData(data);
         setIsModalOpen(false);
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = (): void => {
         setIsModalOpen(true);
     };
 
-    const handleDelete = () => {
+    const handleDelete = (): void => {
         setFormData(null);
         reset();
     };
 
-    const sectionOptions = [
+    const sectionOptions: SelectOption[] = [
         { value: 'sound', label: 'Sound' },
         { value: 'structure', label: 'Structure' },
     ];
 
-    const typeOptions = [
+    const typeOptions: SelectOption[] = [
         { value: 'speakers', label: 'Speakers' },
         { value: 'microphone', label: 'Microphone' },
         { value: 'audio_mixer', label: 'Audio Mixer' },
         { value: 'fixed_fixture', label: 'Fixed Fixture' },
     ];
 
-    const categoryOptions = [
+    const categoryOptions: SelectOption[] = [
         { value: 'category1', label: 'Category 1' },
         { value: 'category2', label: 'Category 2' },
     ];
 
-    const sizeOptions = [
+    const sizeOptions: SelectOption[] = [
         { value: 'small', label: 'Small' },
         { value: 'medium', label: 'Medium' },
         { value: 'large', label: 'Large' },
     ];
+
+    const handleSetCount = (newCount: number): void => {
+        setCount(Math.max(0, newCount));
+    };
 
     return (
         <>
@@ -72,12 +94,14 @@ export const CardItem = () => {
                             <button
                                 onClick={handleUpdate}
                                 className="text-blue-500 underline"
+                                type="button"
                             >
                                 Update
                             </button>
                             <button
                                 onClick={handleDelete}
                                 className="text-red-500 underline"
+                                type="button"
                             >
                                 Delete
                             </button>
@@ -86,6 +110,7 @@ export const CardItem = () => {
                         <button
                             onClick={() => setIsModalOpen(true)}
                             className="flex items-center justify-center gap-1 border-2 border-dashed border-blue-500 text-blue-500 w-44 h-16 px-4 py-2 rounded-md text-sm leading-5"
+                            type="button"
                         >
                             <span className="text-2xl">+</span> Add
                         </button>
@@ -93,8 +118,9 @@ export const CardItem = () => {
 
                     <div className='flex gap-2'>
                         <button
-                            onClick={() => setCount(prev => Math.max(0, prev - 1))}
+                            onClick={() => handleSetCount(count - 1)}
                             className='bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-2xl cursor-pointer text-gray-500'
+                            type="button"
                         >
                             -
                         </button>
@@ -102,8 +128,9 @@ export const CardItem = () => {
                             {count}
                         </span>
                         <button
-                            onClick={() => setCount(prev => prev + 1)}
+                            onClick={() => handleSetCount(count + 1)}
                             className='bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-2xl cursor-pointer text-gray-500'
+                            type="button"
                         >
                             +
                         </button>
@@ -119,7 +146,7 @@ export const CardItem = () => {
                         exit={{ y: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
                         className="fixed inset-0 bg-gray-50 z-50 overflow-y-auto"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
                     >
                         <div className="pb-16">
                             <div className=" px-5 pt-3 pb-2 flex justify-between items-center text-[#0F161E] border-b-2 border-gray-200">
@@ -271,12 +298,13 @@ export const CardItem = () => {
                                             <Controller
                                                 name="assembled"
                                                 control={control}
-                                                render={({ field }) => (
+                                                render={({ field: { value, onChange, ...field } }) => (
                                                     <input
                                                         {...field}
                                                         type="checkbox"
+                                                        checked={value}
+                                                        onChange={(e) => onChange(e.target.checked)}
                                                         className="mr-2 mt-1.5 scale-150"
-                                                        checked={field.value}
                                                     />
                                                 )}
                                             />
@@ -362,14 +390,15 @@ export const CardItem = () => {
                                             control={control}
                                             rules={{ required: "Equipment Image is required" }}
                                             render={({ field: { value, onChange, ...field } }) => (
-                                                
                                                 <div className='w-[160px] p-3 shadow-xl rounded-md'>
-                                                    {/* Hidden File Input */}
                                                     <input
                                                         {...field}
                                                         type="file"
                                                         accept="image/*"
-                                                        onChange={(e) => onChange(e.target.files?.[0])}
+                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                            const file = e.target.files?.[0] || null;
+                                                            onChange(file);
+                                                        }}
                                                         className="hidden"
                                                         id="upload-image"
                                                     />
@@ -380,24 +409,26 @@ export const CardItem = () => {
                                                             className="cursor-pointer border-2 border-dashed border-gray-400 rounded-lg px-2 py-1 flex flex-col items-center justify-center text-center"
                                                         >
                                                             <Image
-                                                                src="/Images/uploadImage.png" // Ensure this image exists in `public/`
+                                                                src="/Images/uploadImage.png"
                                                                 width={500}
                                                                 height={500}
                                                                 alt="Upload"
                                                                 className="w-16 h-16 mb-2"
                                                             />
-                                                            <span className="text-sm font-medium text-[14px] leading-5 text-[#0F161E]">Upload image
-                                                                <p className=' text-[11px] leading-4 font-normal text-[#5A5F66]'>Upload From Your Device</p>
+                                                            <span className="text-sm font-medium text-[14px] leading-5 text-[#0F161E]">
+                                                                Upload image
+                                                                <p className='text-[11px] leading-4 font-normal text-[#5A5F66]'>
+                                                                    Upload From Your Device
+                                                                </p>
                                                             </span>
                                                             {value && (
-                                                                <p className="mt-2 text-blue-500 text-sm">{value.name}</p>
+                                                                <p className="mt-2 text-blue-500 text-sm">
+                                                                    {value.name}
+                                                                </p>
                                                             )}
                                                         </label>
                                                     </div>
-                                                    {/* Custom Upload Button */}
-
                                                 </div>
-                                                
                                             )}
                                         />
                                         {errors.equipmentImage && (

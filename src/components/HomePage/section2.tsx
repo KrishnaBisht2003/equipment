@@ -1,12 +1,11 @@
 'use client'
 
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React from 'react'
 import { CardItem } from './CardItem';
 
 
-function section2() {
-    const [count, setCount] = useState(0);
+function Section2() {
     
   return (
     <>
@@ -65,4 +64,4 @@ function section2() {
   )
 }
 
-export default section2
+export default Section2

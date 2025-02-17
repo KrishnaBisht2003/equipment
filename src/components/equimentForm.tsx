@@ -128,10 +128,10 @@ export default function EquipmentForm({ onClose }: EquipmentFormProps) {
                 className="w-full border rounded-md p-2"
               >
                 <option value="">Select</option>
-                <option value="6">6"</option>
-                <option value="8">8"</option>
-                <option value="10">10"</option>
-                <option value="12">12"</option>
+                <option value="6">6`&quot;`</option>
+                <option value="8">8`&quot;`</option>
+                <option value="10">10`&quot;`</option>
+                <option value="12">12`&quot;`</option>
               </select>
             </div>
             
