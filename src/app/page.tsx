@@ -105,6 +105,9 @@ export default function HomePage() {
     //     </div>
     //   </div>
     // </div>
-    <Homepage/>
+    <>
+      <h1 className="text-[#ff0000]">this is a h1 tag </h1>
+      <Homepage/>
+    </>
   );
 }
