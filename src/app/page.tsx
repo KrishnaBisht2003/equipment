@@ -59,7 +59,7 @@ export default function HomePage() {
 
   return (
     <>
-      <HalfRating/>
+      <h1> there was someting else </h1>
       <Switch />
       <Homepage />
     </>
